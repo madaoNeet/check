@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>check</title>
+</head>
+<body>
+    <h1>Test</h1>
+    <p id="asdf">1</p>
+    <button id="check_that">Check</button>
+
+
+
+
+    <script src="https://code.jquery.com/jquery-3.6.4.js" integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E=" crossorigin="anonymous"></script>
+    <script>
+        const btn = document.querySelector('#check_that');
+let clicked = false;
+
+function delay(time) {
+    return new Promise(resolve => setTimeout(resolve, time));
+}
+
+async function testTest(){
+    await delay(1000);
+    $.ajax({
+            type: 'POST',
+            url: '/https://apply.passport.gov.mm/apply',
+            success: function (response) {
+                let title = "It opened!!!";
+
+                let icon = null; 
+                let body = "Message to be displayed";
+             
+                let notification1 = new Notification(title, { body, icon });
+            },
+            error: function () {
+                console.log("fail");
+                const aaa = Math.floor(Math.random() * 100);
+                document.querySelector('#asdf').innerHTML = aaa;
+                testTest();
+            }
+        });
+}
+
+btn.addEventListener('click',function(e){
+    console.log('asdf');
+
+    testTest();
+
+})
+    </script>
+</body>
+</html>
