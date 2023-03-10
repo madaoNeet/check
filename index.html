@@ -1,56 +1,170 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>check</title>
-</head>
-<body>
-    <h1>Test</h1>
-    <p id="asdf">1</p>
-    <button id="check_that">Check</button>
+    <style>
+      .bg-blue {
+        background-color: blue !important;
+        transform: scale(0.8);
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      style="
+        width: auto;
+        height: auto;
+        display: flex;
+        justify-content: center;
+        padding: 10px 20px;
+      "
+    >
+      <div
+        style="
+          width: 100%;
+          height: 500px;
+          background-color: #f1f1f1;
+          border: 1px solid black;
+          padding: 20px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: space-around;
+        "
+      >
+        <div style="display: flex; justify-content: space-around; width: 100%">
+          <button id="clear" style="font-size: 25px; padding: 0 20px">
+            Clear
+          </button>
+          <button id="noti" style="font-size: 25px">Notification</button>
+        </div>
+        <input
+          id="url"
+          style="width: 100%; height: 50px; font-size: 20px; padding-left: 10px"
+          type="text"
+          placeholder="URL"
+        />
+        <input
+          id="method"
+          style="width: 100%; height: 50px; font-size: 20px; padding-left: 10px"
+          type="text"
+          placeholder="METHOD"
+        />
+        <input
+          id="delay"
+          style="width: 100%; height: 50px; font-size: 20px; padding-left: 10px"
+          type="number"
+          placeholder="ms"
+        />
+        <div style="display: flex; justify-content: space-around; width: 100%">
+          <button id="start" style="font-size: 30px">Start</button>
+          <button id="stop" style="font-size: 30px">Stop</button>
+        </div>
+        <div
+          id="dot"
+          class="bg-blue"
+          style="
+            width: 70px;
+            height: 70px;
+            border-radius: 100px;
+            background-color: red;
+            transition: 100ms;
+          "
+        ></div>
+      </div>
+    </div>
 
-
-
-
-    <script src="https://code.jquery.com/jquery-3.6.4.js" integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E=" crossorigin="anonymous"></script>
+    <script
+      src="https://code.jquery.com/jquery-3.6.4.js"
+      integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E="
+      crossorigin="anonymous"
+    ></script>
     <script>
-        const btn = document.querySelector('#check_that');
-let clicked = false;
+      const btnClear = document.getElementById("clear");
+      const btnNoti = document.getElementById("noti");
+      const btnStart = document.getElementById("start");
+      const btnStop = document.getElementById("stop");
+      const inputUrl = document.getElementById("url");
+      const inputMethod = document.getElementById("method");
+      const inputDelay = document.getElementById("delay");
+      const dot = document.getElementById("dot");
+      let isStopped = false;
 
-function delay(time) {
-    return new Promise(resolve => setTimeout(resolve, time));
-}
+      function delay(time) {
+        return new Promise((resolve) => setTimeout(resolve, time));
+      }
 
-async function testTest(){
-    await delay(1000);
-    $.ajax({
-            type: 'POST',
-            url: '/https://apply.passport.gov.mm/apply',
-            success: function (response) {
-                let title = "It opened!!!";
+      function showNoti() {
+        let title = "Website is opened !!!";
+        let icon = null;
+        let body = "You can enter now";
+        let notification1 = new Notification(title, { body, icon });
+      }
 
-                let icon = null; 
-                let body = "Message to be displayed";
-             
-                let notification1 = new Notification(title, { body, icon });
-            },
-            error: function () {
-                console.log("fail");
-                const aaa = Math.floor(Math.random() * 100);
-                document.querySelector('#asdf').innerHTML = aaa;
-                testTest();
-            }
+      const startRequest = async () => {
+        if (isStopped) return;
+
+        const url = inputUrl.value;
+        const ms = inputDelay.value < 10 ? 10 : inputDelay.value;
+        const method = inputMethod.value ? "GET" : inputMethod.value;
+        console.log(url, ms, method);
+        await delay(ms);
+
+        $.ajax({
+          type: method,
+          url: url,
+          success: function (response) {
+            console.log("success");
+            showNoti();
+            btnStop.click();
+            window.open(url, "_blank");
+          },
+          error: function () {
+            console.log("fail");
+            dot.classList.toggle("bg-blue");
+            startRequest();
+          },
         });
-}
+      };
 
-btn.addEventListener('click',function(e){
-    console.log('asdf');
+      const clearInput = () => {
+        inputDelay.value = "";
+        inputUrl.value = "";
+        inputMethod.value = "";
+      };
 
-    testTest();
+      const requestNoti = () => {
+        if (Notification.permission === "granted") {
+          alert("Notification is ON");
+          return;
+        }
 
-})
+        Notification.requestPermission().then((permission) => {
+          console.log(permission);
+          if (permission === "granted") {
+            return;
+          } else if (permission === "denied") {
+            alert("Please Allow Notification Permission");
+          }
+        });
+      };
+
+      const start = () => {
+        isStopped = false;
+        startRequest();
+      };
+
+      const stop = () => {
+        isStopped = true;
+      };
+
+      btnClear.addEventListener("click", clearInput);
+      btnNoti.addEventListener("click", requestNoti);
+      btnStart.addEventListener("click", start);
+      btnStop.addEventListener("click", stop);
     </script>
-</body>
+  </body>
 </html>
