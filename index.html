@@ -57,6 +57,7 @@
           id="delay"
           style="width: 100%; height: 50px; font-size: 20px; padding-left: 10px"
           type="number"
+          value="1000"
           placeholder="ms"
         />
         <div style="display: flex; justify-content: space-around; width: 100%">
@@ -108,7 +109,7 @@
         if (isStopped) return;
 
         const url = inputUrl.value;
-        const ms = inputDelay.value < 10 ? 10 : inputDelay.value;
+        const ms = inputDelay.value < 100 ? 100 : inputDelay.value;
         const method = inputMethod.value ? "GET" : inputMethod.value;
         console.log(url, ms, method);
         await delay(ms);
