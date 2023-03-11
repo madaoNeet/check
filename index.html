@@ -94,6 +94,9 @@
       const inputDelay = document.getElementById("delay");
       const dot = document.getElementById("dot");
       let isStopped = false;
+      let isNotiOn = True;
+      let isOpenInNewTabOn = True;
+      let stopAfterSuccess = True;
 
       function delay(time) {
         return new Promise((resolve) => setTimeout(resolve, time));
@@ -106,7 +109,7 @@
         let notification1 = new Notification(title, { body, icon });
       }
 
-      const startRequest = async () => {
+      let startRequest = async () => {
         if (isStopped) return;
 
         const url = inputUrl.value;
@@ -119,9 +122,9 @@
           url: url,
           success: function (response) {
             console.log("**success",response, "**");
-            showNoti();
-            btnStop.click();
-            window.open(url, "_blank");
+            if(isNotiOn) showNoti();
+            if(stopAfterSuccess) btnStop.click();
+            if(isOpenInNewTabOn) window.open(url, "_blank");
           },
           error: function () {
             console.log("fail");
